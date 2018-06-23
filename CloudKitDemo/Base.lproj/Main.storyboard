@@ -9,10 +9,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Table View Controller-->
+        <!--Messages Table View Controller-->
         <scene sceneID="hEx-ua-hsW">
             <objects>
-                <tableViewController id="lE3-gB-8dh" sceneMemberID="viewController">
+                <tableViewController id="lE3-gB-8dh" customClass="MessagesTableViewController" customModule="CloudKitDemo" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Qku-zs-R9w">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -35,15 +35,14 @@
                     <navigationItem key="navigationItem" id="5vn-1S-aaE">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="i4H-Wc-78m">
                             <connections>
-                                <action selector="addMessage:" destination="hOL-wh-8fa" id="nXL-ZE-Vlm"/>
+                                <action selector="addMessage:" destination="lE3-gB-8dh" id="TrQ-vL-sdO"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ToO-OR-5CQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <exit id="hOL-wh-8fa" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="1081" y="130"/>
+            <point key="canvasLocation" x="1364" y="130"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Say-8q-Vda">
