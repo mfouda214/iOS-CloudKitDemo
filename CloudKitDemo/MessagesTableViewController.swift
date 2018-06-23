@@ -14,6 +14,8 @@ class MessagesTableViewController: UITableViewController {
     // messages array will hold fetched messages from cloud
     var messages = [CKRecord]()
     
+    var refresh: UIRefreshControl!
+    
     @IBAction func addMessage(_ sender: Any) {
         
         let alert = UIAlertController(title: "New Message", message: "Enter a Message", preferredStyle: .alert)
@@ -33,6 +35,13 @@ class MessagesTableViewController: UITableViewController {
                 publicDatabase.save(newMessage, completionHandler: { (record: CKRecord?, error: Error?) in
                     if error == nil {
                         print("message saved")
+                        DispatchQueue.main.async(execute: {
+                            self.tableView.beginUpdates()
+                            self.messages.insert(newMessage, at: 0)
+                            let indexPath = IndexPath(row: 0, section: 0)
+                            self.tableView.insertRows(at: [indexPath], with: .top)
+                            self.tableView.endUpdates()
+                        })
                     } else {
                         print("Error: \(error.debugDescription)")
                     }
@@ -56,6 +65,11 @@ class MessagesTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        refresh = UIRefreshControl()
+        refresh.attributedTitle = NSAttributedString(string: "Pull to load messages")
+        refresh.addTarget(self, action: #selector(MessagesTableViewController.loadMessages), for: .valueChanged)
+        tableView.addSubview(refresh)
         
         loadMessages()
     }
@@ -142,7 +156,7 @@ class MessagesTableViewController: UITableViewController {
     
     // MARK: - Laod Data from Cloud
     
-    func loadMessages() {
+    @objc func loadMessages() {
         let publicDatabase = CKContainer.default().publicCloudDatabase
         let query = CKQuery(recordType: "Messages", predicate: NSPredicate(format: "TRUEPREDICATE", argumentArray: nil))
         query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
@@ -151,6 +165,7 @@ class MessagesTableViewController: UITableViewController {
                 self.messages = messages
                 DispatchQueue.main.async(execute: {
                     self.tableView.reloadData()
+                    self.refresh.endRefreshing()
                 })
             }
         }
