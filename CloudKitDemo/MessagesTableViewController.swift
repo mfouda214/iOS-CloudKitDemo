@@ -10,7 +10,10 @@ import UIKit
 import CloudKit
 
 class MessagesTableViewController: UITableViewController {
-
+    
+    // messages array will hold fetched messages from cloud
+    var messages = [CKRecord]()
+    
     @IBAction func addMessage(_ sender: Any) {
         
         let alert = UIAlertController(title: "New Message", message: "Enter a Message", preferredStyle: .alert)
@@ -53,6 +56,8 @@ class MessagesTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        loadMessages()
     }
 
     override func didReceiveMemoryWarning() {
@@ -64,23 +69,31 @@ class MessagesTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return messages.count
     }
 
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let message = messages[indexPath.row]
+        
+        if let content = message["content"] as? String {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM/dd/yyyy"
+            let date = dateFormatter.string(from: message.creationDate!)
+            
+            cell.textLabel?.text = content
+            cell.detailTextLabel?.text = date
+        }
+        
         return cell
     }
-    */
+ 
 
     /*
     // Override to support conditional editing of the table view.
@@ -126,5 +139,21 @@ class MessagesTableViewController: UITableViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    // MARK: - Laod Data from Cloud
+    
+    func loadMessages() {
+        let publicDatabase = CKContainer.default().publicCloudDatabase
+        let query = CKQuery(recordType: "Messages", predicate: NSPredicate(format: "TRUEPREDICATE", argumentArray: nil))
+        query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        publicDatabase.perform(query, inZoneWith: nil) { (results: [CKRecord]?, error: Error?) in
+            if let messages = results {
+                self.messages = messages
+                DispatchQueue.main.async(execute: {
+                    self.tableView.reloadData()
+                })
+            }
+        }
+    }
 
 }
