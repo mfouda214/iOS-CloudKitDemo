@@ -13,9 +13,36 @@ class MessagesTableViewController: UITableViewController {
 
     @IBAction func addMessage(_ sender: Any) {
         
+        let alert = UIAlertController(title: "New Message", message: "Enter a Message", preferredStyle: .alert)
         
+        alert.addTextField { (textField: UITextField) in
+            textField.placeholder = "Your message..."
+        }
         
+        alert.addAction(UIAlertAction(title: "Send", style: .default, handler: { (action: UIAlertAction) in
+            let textField = alert.textFields?.first
+            
+            if textField?.text != "" {
+                let newMessage = CKRecord(recordType: "Messages")
+                newMessage["content"] = textField?.text as CKRecordValue?
+                
+                let publicDatabase = CKContainer.default().publicCloudDatabase
+                publicDatabase.save(newMessage, completionHandler: { (record: CKRecord?, error: Error?) in
+                    if error == nil {
+                        print("message saved")
+                    } else {
+                        print("Error: \(error.debugDescription)")
+                    }
+                })
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        present(alert, animated: true, completion: nil)
     }
+        
+    
     
     
     override func viewDidLoad() {
